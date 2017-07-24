@@ -16,25 +16,24 @@
     function clear() {
         output.innerHTML = "";
     }
-	function printAttrs(object) {
-	    for(var key in object)
-		    print(key + ": " + object[key]);
-	}
+    function printAttrs(object) {
+        for(var key in object)
+            print(key + ": " + object[key]);
+    }
     input.addEventListener("keydown", function(event) {
         if(event.keyCode == 13) {
-		    try {
+            try {
                 eval(input.value);
                 input.value = "";
-			} catch(exception) {
-			    print(exception);
-			}
+            } catch(exception) {
+                print(exception);
+            }
         }
     });
     inputButton.addEventListener("click", function(event) {
         eval(input.value);
         input.value = "";
     });
-
     </script>
 </body>
 </html>

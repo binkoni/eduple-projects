@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width"/>
-	<meta name="viewport" content="user-scalable=no"/>
+    <meta name="viewport" content="user-scalable=no"/>
     <title>Test</title>  
 </head>
 <body>
@@ -13,43 +13,43 @@ var app = app || {};
 ////////////////////////////////////////////////////////////////////////////////
 app.Vector = function(x, y) {
     this.x = x;
-	this.y = y;
+    this.y = y;
 };
 
 app.Vector.fromAngle = function(angle, magnitude) {
-	return new app.Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+    return new app.Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
 };
 
 app.Vector.clone = function(vector) {
-	return new app.Vector(vector.x, vector.y);
+    return new app.Vector(vector.x, vector.y);
 };
 
 app.Vector.add = function(vector1, vector2) {
-	return new app.Vector(vector1.x + vector2.x, vector1.y + vector2.y);
+    return new app.Vector(vector1.x + vector2.x, vector1.y + vector2.y);
 };
 
 app.Vector.subtract = function(vector1, vector2) {
-	return new app.Vector(vector1.x - vector2.x, vector1.y - vector2.y);
+    return new app.Vector(vector1.x - vector2.x, vector1.y - vector2.y);
 };
 
 app.Vector.multiply = function(vector, scalar) {
-	return new app.Vector(vector.x * scalar, vector.y * scalar);
+    return new app.Vector(vector.x * scalar, vector.y * scalar);
 };
 
 app.Vector.prototype.clone = function() {
-	return new app.Vector(this.x, this.y);
+    return new app.Vector(this.x, this.y);
 };
 
 app.Vector.prototype.set = function(vector) {
-	this.x = vector.x;
-	this.y = vector.y;
-	return this;
+    this.x = vector.x;
+    this.y = vector.y;
+    return this;
 };
 
 app.Vector.prototype.setCoords = function(x, y) {
     this.x = x;
-	this.y = y;
-	return this;
+    this.y = y;
+    return this;
 };
 
 app.Vector.prototype.getMagnitude = function() {
@@ -62,162 +62,162 @@ app.Vector.prototype.getAngle = function() {
 
 app.Vector.prototype.setAngle = function(angle) {
     var magnitude = this.getMagnitude();
-	this.x = magnitude * Math.cos(angle);
-	this.y = magnitude * Math.sin(angle);
-	return this;
+    this.x = magnitude * Math.cos(angle);
+    this.y = magnitude * Math.sin(angle);
+    return this;
 };
 
 app.Vector.prototype.setMagnitude = function(magnitude) {
-	var angle = this.getAngle();
-	this.x = magnitude * Math.cos(angle);
-	this.y = magnitude * Math.sin(angle);
-	return this;
+    var angle = this.getAngle();
+    this.x = magnitude * Math.cos(angle);
+    this.y = magnitude * Math.sin(angle);
+    return this;
 };
 
 app.Vector.prototype.add = function(vector) {
-	this.x += vector.x;
-	this.y += vector.y;
-	return this;
+    this.x += vector.x;
+    this.y += vector.y;
+    return this;
 };
 
 app.Vector.prototype.subtract = function(vector) {
-	this.x -= vector.x;
-	this.y -= vector.y;
-	return this;
+    this.x -= vector.x;
+    this.y -= vector.y;
+    return this;
 };
 
 app.Vector.prototype.multiply = function(scalar) {
-	this.x *= scalar;
-	this.y *= scalar;
-	return this;
+    this.x *= scalar;
+    this.y *= scalar;
+    return this;
 };
 ////////////////////////////////////////////////////////////////////////////////
 app.Particle = function(position, velocity, acceleration, mass, color) {
     this.position = position;
-	this.velocity = velocity;
-	this.acceleration = acceleration;
-	this.mass = mass;
-	this.color = color;
+    this.velocity = velocity;
+    this.acceleration = acceleration;
+    this.mass = mass;
+    this.color = color;
 };
 
 app.Particle.prototype.move = function(deltaTime) {
     for(var index in app.fields) {
-	    this.acceleration.set(
-		    app.Vector.subtract(
-		        app.fields[index].position, this.position
-			)
-			.setMagnitude(1)
-		    .multiply(
-			    app.G * this.mass * app.fields[index].mass
-				/ Math.pow(
-				      app.Vector.subtract(
-					      app.fields[index].position, this.position
-				      )
-					  .getMagnitude(),
-					  2
-				  )
-				  / this.mass
-			)
-		);
-		
-		this.velocity.add(app.Vector.multiply(this.acceleration, deltaTime));
+        this.acceleration.set(
+            app.Vector.subtract(
+                app.fields[index].position, this.position
+            )
+            .setMagnitude(1)
+            .multiply(
+                app.G * this.mass * app.fields[index].mass
+                / Math.pow(
+                      app.Vector.subtract(
+                          app.fields[index].position, this.position
+                      )
+                      .getMagnitude(),
+                      2
+                  )
+                  / this.mass
+            )
+        );
+        
+        this.velocity.add(app.Vector.multiply(this.acceleration, deltaTime));
         this.position.add(app.Vector.multiply(this.velocity, deltaTime));
-	}
+    }
 };
 
 app.Trace = function(position, color, timeStamp) {
     this.position = position;
-	this.color = color;
-	this.timeStamp = timeStamp;
+    this.color = color;
+    this.timeStamp = timeStamp;
 };
 
 app.Emitter = function(position, angle, magnitude) {
     this.position = position;
-	this.power = app.Vector.fromAngle(angle, magnitude);
+    this.power = app.Vector.fromAngle(angle, magnitude);
 };
 
 app.Emitter.prototype.emit = function(particles) {
     particles.push(new app.Particle(
-	    this.position.clone(),
-	    app.Vector.clone(this.power).setAngle(Math.PI / 3 * 6 * Math.random()).setMagnitude((9 * Math.random() + 1) / 100),
-		new app.Vector(0, 0),
-		100 * Math.random(),
-		"rgb(" + Math.floor(255 * Math.random()) + "," + Math.floor(255 * Math.random()) + "," + Math.floor(255 * Math.random()) + ")"
-	));
+        this.position.clone(),
+        app.Vector.clone(this.power).setAngle(Math.PI / 3 * 6 * Math.random()).setMagnitude((9 * Math.random() + 1) / 100),
+        new app.Vector(0, 0),
+        100 * Math.random(),
+        "rgb(" + Math.floor(255 * Math.random()) + "," + Math.floor(255 * Math.random()) + "," + Math.floor(255 * Math.random()) + ")"
+    ));
 };
 
 app.Field = function(position, mass) {
     this.position = position;
-	this.mass = mass;
+    this.mass = mass;
 };
 
 app.updateLoop = function() {
     app.lastTime = app.currentTime;
     app.currentTime = Date.now();
-	app.deltaTime = app.currentTime - app.lastTime;
+    app.deltaTime = app.currentTime - app.lastTime;
 
-	if(app.event.occured) {
-	    app.emitter.position.x = app.event.x;
-	    app.emitter.position.y = app.event.y;
-		app.emitter.emit(app.particles);
-	}
-	for(var index in app.particles) {
-		
-	    app.traces.push(new app.Trace(app.particles[index].position.clone(), app.particles[index].color, app.currentTime));
-	    app.particles[index].move(app.deltaTime);
-	}
-	
-	for(var index = app.particles.length - 1; index >= 0; --index) {
-	    if(app.particles[index].position.x < 0 ||
-		   app.particles[index].position.x > app.canvas.width ||
-		   app.particles[index].position.y < 0 ||
-		   app.particles[index].position.y > app.canvas.height) {
-		   app.particles.splice(index, 1);
-		}
-	}
-	for(var index = app.traces.length - 1; index >= 0; --index) {
-	    if(app.currentTime - app.traces[index].timeStamp > 1000)
-		    app.traces.splice(index, 1);
-	}
-	
+    if(app.event.occured) {
+        app.emitter.position.x = app.event.x;
+        app.emitter.position.y = app.event.y;
+        app.emitter.emit(app.particles);
+    }
+    for(var index in app.particles) {
+        
+        app.traces.push(new app.Trace(app.particles[index].position.clone(), app.particles[index].color, app.currentTime));
+        app.particles[index].move(app.deltaTime);
+    }
+    
+    for(var index = app.particles.length - 1; index >= 0; --index) {
+        if(app.particles[index].position.x < 0 ||
+           app.particles[index].position.x > app.canvas.width ||
+           app.particles[index].position.y < 0 ||
+           app.particles[index].position.y > app.canvas.height) {
+           app.particles.splice(index, 1);
+        }
+    }
+    for(var index = app.traces.length - 1; index >= 0; --index) {
+        if(app.currentTime - app.traces[index].timeStamp > 1000)
+            app.traces.splice(index, 1);
+    }
+    
 };
 app.renderLoop = function() {
     app.canvasContext.clearRect(0, 0, app.canvas.width, app.canvas.height);
-	for(var index in app.traces) {
-	    app.canvasContext.fillStyle = app.traces[index].color;
-		app.canvasContext.globalAlpha = Math.random();
-	    app.canvasContext.fillRect(
-		    app.traces[index].position.x,
-		    app.traces[index].position.y,
-			5,
-			5
-		);
-	}
-	
+    for(var index in app.traces) {
+        app.canvasContext.fillStyle = app.traces[index].color;
+        app.canvasContext.globalAlpha = Math.random();
+        app.canvasContext.fillRect(
+            app.traces[index].position.x,
+            app.traces[index].position.y,
+            5,
+            5
+        );
+    }
+    
     for(var index in app.particles) {
-	    app.canvasContext.fillStyle = app.particles[index].color;
-		app.canvasContext.globalAlpha = Math.random();
-	}
-	
-	for(var index in app.fields) {
-	    if(app.fields[index].mass >= 0)
-	        app.canvasContext.fillStyle = "red";
-		else
-		    app.canvasContext.fillStyle = "blue";
-		app.canvasContext.globalAlpha = 1;
-	    app.canvasContext.fillRect(
-		    app.fields[index].position.x,
-		    app.fields[index].position.y,
-			10,
-			10
-		);
-	}
-	
+        app.canvasContext.fillStyle = app.particles[index].color;
+        app.canvasContext.globalAlpha = Math.random();
+    }
+    
+    for(var index in app.fields) {
+        if(app.fields[index].mass >= 0)
+            app.canvasContext.fillStyle = "red";
+        else
+            app.canvasContext.fillStyle = "blue";
+        app.canvasContext.globalAlpha = 1;
+        app.canvasContext.fillRect(
+            app.fields[index].position.x,
+            app.fields[index].position.y,
+            10,
+            10
+        );
+    }
+    
 };
 
 app.mainLoop = function() {
     app.updateLoop();
-	app.renderLoop();
+    app.renderLoop();
     requestAnimationFrame(app.mainLoop);
 };
 
@@ -228,20 +228,20 @@ app.resize = function() {
 
 app.init = function() {
     app.event = {
-	    occured: false,
+        occured: false,
         x: 0,
-	    y: 0
+        y: 0
     };
-	app.G = 0.1;
-	app.currentTime = Date.now();
+    app.G = 0.1;
+    app.currentTime = Date.now();
     app.canvas = document.getElementById("canvas");
     app.canvasContext = document.getElementById("canvas").getContext("2d");
-	app.console = document.getElementById("console");
+    app.console = document.getElementById("console");
     app.resize();
-	app.fields = [new app.Field(new app.Vector(app.canvas.width / 2, app.canvas.height / 2), 50), new app.Field(new app.Vector(app.canvas.width / 4, app.canvas.height / 4), 50)];
-	app.emitter = new app.Emitter(new app.Vector(app.canvas.width / 2, app.canvas.height / 2), Math.PI / 2, 3);
-	app.particles = [];
-	app.traces = [];
+    app.fields = [new app.Field(new app.Vector(app.canvas.width / 2, app.canvas.height / 2), 50), new app.Field(new app.Vector(app.canvas.width / 4, app.canvas.height / 4), 50)];
+    app.emitter = new app.Emitter(new app.Vector(app.canvas.width / 2, app.canvas.height / 2), Math.PI / 2, 3);
+    app.particles = [];
+    app.traces = [];
     requestAnimationFrame(app.mainLoop);
 };
 document.addEventListener("touchstart", function(event) {

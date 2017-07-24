@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width"/>
-	<script type="text/javascript" src="vector.js"></script>
+    <script type="text/javascript" src="vector.js"></script>
 </head>
 <body>
 <div id="output"/>
@@ -12,23 +12,23 @@
     function print(text) {
         output.innerHTML += text + "<br/>";
     }
-	function printObject(object) {
-	    for(var attr in object)
-		    print(attr + ": " + object[attr]);
-	}
+    function printObject(object) {
+        for(var attr in object)
+            print(attr + ": " + object[attr]);
+    }
     function clear() {
         output.innerHTML = "";
     }
-	var canvas = document.createElement("canvas");
-	//printObject(canvas);
-	var arr = [];
-	arr[9] = 'hi';
-	arr[0] = 'bye';
-	delete arr[0];
-	print(arr[9]);
-	
-	print(arr[0]);
-	
+    var canvas = document.createElement("canvas");
+    //printObject(canvas);
+    var arr = [];
+    arr[9] = 'hi';
+    arr[0] = 'bye';
+    delete arr[0];
+    print(arr[9]);
+    
+    print(arr[0]);
+    
 </script>
 </body>
 </html>

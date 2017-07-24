@@ -7,7 +7,7 @@
 <body>
 <div id="menu-area">
     <input type="color" id="color-picker" value="black"/>
-  	<input type="range" id="size-picker" min="1" max="500" value="20"/>
+      <input type="range" id="size-picker" min="1" max="500" value="20"/>
     <button id="pencil-button">pencil</button>
     <button id="eraser-button">eraser</button>
     <input id="image-data"></input>
@@ -25,140 +25,140 @@ var app = {};
 
 app.Pencil = function(params) {
     this.canvas = params.canvas;
-	this.context = params.canvas.getContext("2d");
-	//this.context.scale(2, 2);
-	this.size = params.size;
-	this.color = params.color
+    this.context = params.canvas.getContext("2d");
+    //this.context.scale(2, 2);
+    this.size = params.size;
+    this.color = params.color
 };
 
 app.Pencil.prototype.draw = function(x, y) {
-	this.context.fillStyle = this.color;
+    this.context.fillStyle = this.color;
     this.context.fillRect(Math.floor(x / this.size) * this.size,
-	                      Math.floor(y / this.size) * this.size,
-						  this.size,
-						  this.size);
+                          Math.floor(y / this.size) * this.size,
+                          this.size,
+                          this.size);
 };
 
 app.Eraser = function(params) {
-	this.canvas = params.canvas;
-	this.context = params.canvas.getContext("2d");
-	this.size = params.size;
+    this.canvas = params.canvas;
+    this.context = params.canvas.getContext("2d");
+    this.size = params.size;
 };
 
 app.Eraser.prototype.draw = function(x, y) {
     this.context.clearRect(
-	    Math.floor(x / this.size) * this.size,
-	    Math.floor(y / this.size) * this.size,
-	    this.size,
+        Math.floor(x / this.size) * this.size,
+        Math.floor(y / this.size) * this.size,
+        this.size,
         this.size
-	);
+    );
 };
 
 app.init = function() {
     
     var canvas = document.getElementById("canvas");
-	canvas.width = document.body.offsetWidth - 10;
-	canvas.height = canvas.width;
+    canvas.width = document.body.offsetWidth - 10;
+    canvas.height = canvas.width;
     var canvasContext = canvas.getContext("2d");
-	canvasContext.imageSmoothingEnabled = false;
+    canvasContext.imageSmoothingEnabled = false;
     var painters = {};
     painters.pencil = new app.Pencil({
         canvas: canvas,
         size: 20,
-		color: "black"
+        color: "black"
     });
     painters.eraser = new app.Eraser({
-	      canvas: canvas,
-	      size: 20
+          canvas: canvas,
+          size: 20
     });
 
     var painter = painters.pencil;
     var colorPicker = document.getElementById("color-picker");
     colorPicker.addEventListener("change", function(event) {
-	      painters.pencil.color = this.value;
+          painters.pencil.color = this.value;
     });
-	colorPicker.addEventListener("click", function(event) {
-	      painters.pencil.color = this.value;
+    colorPicker.addEventListener("click", function(event) {
+          painters.pencil.color = this.value;
     });
-	painters.pencil.color = colorPicker.value;
+    painters.pencil.color = colorPicker.value;
     var sizePicker = document.getElementById("size-picker");
     sizePicker.addEventListener("change", function(event) {
-	      painter.size = this.value;
+          painter.size = this.value;
     });
     var pencilButton = document.getElementById("pencil-button");
     pencilButton.addEventListener("click", function(event) {
-	    painter = painters.pencil;
+        painter = painters.pencil;
         sizePicker.value = painter.size;
-	});
-	var eraserButton = document.getElementById("eraser-button");
-	eraserButton.addEventListener("click", function(event) {
-	    painter = painters.eraser;
-		sizePicker.value = painter.size;
-	});
-	var imageData = document.getElementById("image-data");
-	var imageLoadButton = document.getElementById("image-load-button");
-	var imageSaveButton = document.getElementById("image-save-button");
-	
-	imageLoadButton.addEventListener("click", function(event) {
-	    var image = new Image();
-		image.onload = function() {
-		    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-	        canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
-		};
-		image.src = imageData.value;
-	});
-	imageSaveButton.addEventListener("click", function(event) {
-	    imageData.value = canvas.toDataURL();
-		var image = new Image();
-		image.onload = function() {
-		    canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
-		};
-		image.src = imageData.value;
-		imageData.focus();
-		imageData.setSelectionRange(0, imageData.value.length);
-		document.execCommand("copy");
-	});
-	var clearButton = document.getElementById("clear-button");
-	clearButton.addEventListener("click", function(event) {
-	     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-	});
-	var history = [];
-	var undoHistory = [];
-	var undoButton = document.getElementById("undo-button");
-	undoButton.addEventListener("click", function(event) {
-	    var image = history.pop();
-		undoHistory.push(image);
-		canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-	    canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
-	});
-	
-	var redoButton = document.getElementById("redo-button");
-	redoButton.addEventListener("click", function(event) {
-	    var image = undoHistory.pop();
-		if(image) {
-		    history.push(image);
-		    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-	        canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
-		}
-	});
-	
-	
-	canvas.addEventListener("touchstart", function(event) {
+    });
+    var eraserButton = document.getElementById("eraser-button");
+    eraserButton.addEventListener("click", function(event) {
+        painter = painters.eraser;
+        sizePicker.value = painter.size;
+    });
+    var imageData = document.getElementById("image-data");
+    var imageLoadButton = document.getElementById("image-load-button");
+    var imageSaveButton = document.getElementById("image-save-button");
+    
+    imageLoadButton.addEventListener("click", function(event) {
+        var image = new Image();
+        image.onload = function() {
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
+        };
+        image.src = imageData.value;
+    });
+    imageSaveButton.addEventListener("click", function(event) {
+        imageData.value = canvas.toDataURL();
+        var image = new Image();
+        image.onload = function() {
+            canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
+        };
+        image.src = imageData.value;
+        imageData.focus();
+        imageData.setSelectionRange(0, imageData.value.length);
+        document.execCommand("copy");
+    });
+    var clearButton = document.getElementById("clear-button");
+    clearButton.addEventListener("click", function(event) {
+         canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+    });
+    var history = [];
+    var undoHistory = [];
+    var undoButton = document.getElementById("undo-button");
+    undoButton.addEventListener("click", function(event) {
+        var image = history.pop();
+        undoHistory.push(image);
+        canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+        canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
+    });
+    
+    var redoButton = document.getElementById("redo-button");
+    redoButton.addEventListener("click", function(event) {
+        var image = undoHistory.pop();
+        if(image) {
+            history.push(image);
+            canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+            canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
+        }
+    });
+    
+    
+    canvas.addEventListener("touchstart", function(event) {
         event.x = event.touches[0].clientX - this.offsetLeft;
         event.y = event.touches[0].clientY - this.offsetTop;
-    	painter.draw(event.x, event.y);
+        painter.draw(event.x, event.y);
     });
     canvas.addEventListener("touchmove", function(event) {
         event.x = event.touches[0].clientX - this.offsetLeft;
         event.y = event.touches[0].clientY - this.offsetTop;
-    	painter.draw(event.x, event.y);
+        painter.draw(event.x, event.y);
     });
     canvas.addEventListener("touchend", function(event) {
-		var image = new Image();
-		image.src = canvas.toDataURL();
-		canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
-		history.push(image);
-		undoHistory = [];
+        var image = new Image();
+        image.src = canvas.toDataURL();
+        canvasContext.drawImage(image, 0, 0, canvas.width, canvas.height);
+        history.push(image);
+        undoHistory = [];
     });
 };
 
