@@ -1,0 +1,525 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width"/>
+	<meta name="viewport" content="user-scalable=no"/>
+    <title>Test</title>
+</head>
+<body>
+<canvas id="canvas" style="background-color:black"/>
+
+<script type="text/javascript">
+  
+var app = {
+    score: 0,
+    timeStamp: 0,
+    event: {
+        occured: false,
+        x: 0,
+        y: 0
+    },
+    camera: {
+        x: 0,
+        y: 0
+    }
+};
+app.canvas = document.getElementById("canvas");
+app.canvasContext = document.getElementById("canvas").getContext("2d");
+
+app.Vector = function(x, y) {
+    this.x = x;
+	this.y = y;
+};
+
+app.Vector.fromAngle = function(angle, magnitude) {
+	return new app.Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+};
+
+app.Vector.clone = function(vector) {
+	return new app.Vector(vector.x, vector.y);
+};
+
+app.Vector.add = function(vector1, vector2) {
+	return new app.Vector(vector1.x + vector2.x, vector1.y + vector2.y);
+};
+
+app.Vector.prototype.clone = function() {
+	return new app.Vector(this.x, this.y);
+};
+
+app.Vector.prototype.set = function(x, y) {
+	this.x = x;
+	this.y = y;
+	return this;
+};
+
+app.Vector.prototype.getMagnitude = function() {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+};
+
+app.Vector.prototype.getAngle = function() {
+    return Math.atan2(this.y, this.x);
+};
+
+app.Vector.prototype.setAngle = function(angle) {
+    var magnitude = this.getMagnitude();
+	this.x = magnitude * Math.cos(angle);
+	this.y = magnitude * Math.sin(angle);
+	return this;
+};
+
+app.Vector.prototype.setMagnitude = function(magnitude) {
+	var angle = this.getAngle();
+	this.x = magnitude * Math.cos(angle);
+	this.y = magnitude * Math.sin(angle);
+	return this;
+};
+
+app.Vector.prototype.add = function(vector) {
+	this.x += vector.x;
+	this.y += vector.y;
+};
+
+app.Vector.prototype.subtract = function(vector) {
+	this.x -= vector.x;
+	this.y -= vector.y;
+};
+
+app.Entity = function() {
+  this.components = {};
+};
+app.Entity.prototype.addComponent = function(component) {
+  this.components[component.name] = component;
+};
+app.Entity.prototype.removeComponent = function(componentName) {
+  var component = this.components[componentName];
+  delete this.components[compomentName];
+  return component;
+};
+
+app.Position = function(x, y) {
+  this.x = x || 0;
+  this.y = y || 0;
+};
+app.Position.prototype.name = "position";
+
+app.Velocity = function(x, y) {
+  this.x = x || 0;
+  this.y = y || 0;
+};
+app.Velocity.prototype.name = "velocity";
+
+app.Acceleration = function(x, y) {
+  this.x = x || 0;
+  this.y = y || 0;
+};
+app.Acceleration.prototype.name = "acceleration";
+
+app.Health = function(value) {
+  this.value = value || 100;
+};
+app.Health.prototype.name = "health";
+
+app.Collision = function(params) {
+    this.ally = params.ally;
+    this.damage = params.damage;
+	this.death = params.death;
+};
+app.Collision.prototype.name = "collision";
+
+app.Shooter = function(params) {
+    this.isShooting = params.isShooting || false;
+    this.damage = params.damage || 1;
+    this.initialTimeStamp = params.initialTimeStamp || app.timeStamp;
+    this.delay = params.delay || 4;
+	this.power = params.power || 5;
+	this.angle = params.angle;
+	this.target = params.target;
+};
+app.Shooter.prototype.name = "shooter";
+
+app.PlayerControlled = function(value) {
+  this.value = value || true;
+};
+app.PlayerControlled.prototype.name = "playerControlled";
+
+app.Size = function(width, height) {
+  this.width = width;
+  this.height = height;
+};
+app.Size.prototype.name = "size";
+
+app.CameraDeath = function(up, down, left, right) {
+    this.up = up;
+	this.down = down;
+	this.left = left;
+	this.right = right;
+};
+app.CameraDeath.prototype.name = "cameraDeath";
+
+app.Visual = function(params) {
+    this.width = params.width;
+	this.height = params.height;
+	this.lineWidth = params.lineWidth || 1;
+	this.color = params.color || "white";
+};
+app.Visual.prototype.name = "visual";
+
+app.Death = function(value) {
+    this.value = value || false;
+};
+app.Death.prototype.name = "death";
+
+app.Player = function(params) {
+    app.Entity.call(this);
+    this.addComponent(new app.PlayerControlled(true));
+    this.addComponent(new app.Position(params.x || app.canvas.width / 2, params.y || app.canvas.height / 2));
+	this.addComponent(new app.Size(params.width, params.height));
+    this.addComponent(new app.Velocity(0, 0));
+    this.addComponent(new app.Acceleration(0, 0));
+    this.addComponent(new app.Health(100));
+    this.addComponent(new app.Shooter({
+	    damage: 5,
+		delay: 5,
+		power: 10,
+		angle: Math.PI * 3 / 2,
+		isShooting: true
+    }));
+	this.addComponent(new app.Visual({
+	    width: params.width,
+		height: params.height,
+		lineWidth: 4,
+		color: "green"
+	}));
+	this.addComponent(new app.Collision({
+		damage: params.damage || 10,
+		death: false
+	}));
+	this.addComponent(new app.Death(false));
+};
+app.Player.prototype = {};
+app.Player.prototype.__proto__ = app.Entity.prototype;
+
+app.Enemy = function(params) {
+    app.Entity.call(this);
+	params.width = Math.random() * 275 + 25;
+	params.height = Math.random() * 275 + 25;
+	this.addComponent(new app.Position(params.x, params.y));
+	this.addComponent(new app.Size(params.width, params.height));
+	this.addComponent(new app.CameraDeath(false, true, false, false));
+	this.addComponent(new app.Velocity(0, 4 * Math.random()));
+    this.addComponent(new app.Acceleration(0, 0));
+    this.addComponent(new app.Health(Math.floor(199 * Math.random() + 1)));
+    this.addComponent(new app.Shooter({
+	    damage: Math.floor(9 * Math.random() + 1),
+		power: 10 * Math.random(),
+		angle: Math.PI / 2,
+		isShooting: params.isShooting,
+		delay: Math.floor(70 * Math.random() + 10)
+	}));
+	this.addComponent(new app.Visual({
+	    width: params.width,
+		height: params.height,
+		lineWidth: 4,
+		color: "red"
+	}));
+	this.addComponent(new app.Collision({
+		damage: params.damage || 1,
+		death: false
+	}));
+	this.addComponent(new app.Death(false));
+};
+app.Enemy.prototype = {};
+app.Enemy.prototype.__proto__ = app.Entity.prototype;
+
+app.Aid = function(params) {
+    app.Entity.call(this);
+	this.addComponent(new app.Position(params.x, params.y));
+	this.addComponent(new app.Size(100, 100));
+	this.addComponent(new app.CameraDeath(false, true, false, false));
+	this.addComponent(new app.Visual({
+	    width: 100,
+		height: 100,
+		lineWidth: 4,
+		color: "white"
+	}));
+	this.addComponent(new app.Health(100));
+	this.addComponent(new app.Collision({
+		damage: -1,
+		death: false
+	}));
+	this.addComponent(new app.Death(false));
+};
+app.Aid.prototype = {};
+app.Aid.prototype.__proto__ = app.Entity.prototype;
+
+app.Bullet = function(params) {
+    app.Entity.call(this);
+	this.addComponent(new app.Position(params.x, params.y));
+	this.addComponent(new app.Size(params.width || 10, params.height || 10));
+	this.addComponent(new app.CameraDeath(true, true, true, true));
+	this.addComponent(new app.Velocity(params.vx, params.vy));
+	this.addComponent(new app.Acceleration(0, 0));
+    this.addComponent(new app.Collision({
+	    ally: params.ally,
+		damage: params.damage || 5,
+		death: params.death
+	}));
+	this.addComponent(new app.Visual({
+	    width: params.width || 10,
+		height: params.height || 10,
+		lineWidth: 2,
+		color: "yellow"
+	}));
+	this.addComponent(new app.Death(false));
+};
+app.Bullet.prototype = {};
+app.Bullet.prototype.__proto__ = app.Entity.prototype;
+
+app.handleEvent = function(entities, event) {
+    if(event.occured) {
+        for(var index in entities) {
+            if(entities[index].components.playerControlled &&
+			   entities[index].components.playerControlled.value &&
+	           entities[index].components.position &&
+		       entities[index].components.velocity) {
+	            if(entities[index].components.shooter &&
+		           event.x > entities[index].components.position.x &&
+                   event.x < entities[index].components.position.x + entities[index].components.size.width &&
+                   event.y > entities[index].components.position.y &&
+                   event.y < entities[index].components.position.y + entities[index].components.size.height) {
+		            entities[index].components.velocity.x = 0;
+					entities[index].components.velocity.y = 0;
+		        } else {
+			   	    entities[index].components.velocity.x = 8 * Math.cos(Math.atan2(event.y - entities[index].components.position.y, event.x - entities[index].components.position.x));
+				    entities[index].components.velocity.y = 8 * Math.sin(Math.atan2(event.y - entities[index].components.position.y, event.x - entities[index].components.position.x));
+				}
+	        }
+        }
+	    event.occured = false;
+    }
+};
+
+app.handleShooting = function(entities) {
+    for(var index = entities.length - 1; index >= 0; --index) {
+	    if(entities[index].components.shooter &&
+		   entities[index].components.shooter.isShooting &&
+		   entities[index].components.position &&
+		   (app.timeStamp + entities[index].components.shooter.initialTimeStamp) % entities[index].components.shooter.delay == 0) {
+		    if(entities[index].components.shooter.target) {
+		        entities[index].components.shooter.angle = Math.atan2(entities[index].components.shooter.target.y - entities[index].components.position.y,
+		                                                             entities[index].components.shooter.target.x - entities[index].components.position.x);
+			}
+		    entities.push(new app.Bullet({
+		        ally: entities[index],
+    	        x: entities[index].components.position.x +
+			    entities[index].components.size.width / 2,
+		        y: entities[index].components.position.y +
+			    entities[index].components.size.height / 2,
+			    vx: entities[index].components.shooter.power * Math.cos(entities[index].components.shooter.angle),
+			    vy: entities[index].components.shooter.power * Math.sin(entities[index].components.shooter.angle),
+			    damage: entities[index].components.shooter.damage,
+				death: true
+			}));
+		}
+	}
+};
+
+app.handleMovement = function(entities) {
+    for(index in entities) {
+        if(entities[index].components.position &&
+            entities[index].components.velocity &&
+            entities[index].components.acceleration) {
+            entities[index].components.velocity.x += entities[index].components.acceleration.x;
+            entities[index].components.position.x += entities[index].components.velocity.x;
+            entities[index].components.velocity.y += entities[index].components.acceleration.y;
+            entities[index].components.position.y += entities[index].components.velocity.y;
+	        entities[index].components.acceleration.x = 0;
+	        entities[index].components.acceleration.y = 0;
+			if(entities[index].components.playerControlled &&
+			   entities[index].components.position.x < app.camera.x) {
+			   entities[index].components.position.x =  app.camera.x;
+			} else if(entities[index].components.playerControlled &&
+			   entities[index].components.position.x > app.canvas.width + app.camera.x - entities[index].components.size.width) {
+			   entities[index].components.position.x =  app.canvas.width + app.camera.x - entities[index].components.size.width;
+			} if(entities[index].components.playerControlled &&
+			   entities[index].components.position.y < app.camera.y) {
+			   entities[index].components.position.y =  app.camera.y;
+			} else if(entities[index].components.playerControlled &&
+			   entities[index].components.position.y > app.canvas.height + app.camera.y - entities[index].components.size.height) {
+			   entities[index].components.position.y =  app.canvas.height + app.camera.y - entities[index].components.size.height;
+			}
+        }
+    }
+};
+
+app.handleCameraDeath = function(entities, camera) {
+    for(var index in entities) {
+	    if(entities[index].components.cameraDeath) {
+	        if(entities[index].components.cameraDeath.up &&
+			   entities[index].components.position.y < 0 + camera.y) {
+		        entities[index].components.death.value = true;
+			} else if(entities[index].components.cameraDeath.down &&
+			   entities[index].components.position.y > app.canvas.height + camera.y) {
+			    entities[index].components.death.value = true; 
+			} else if(entities[index].components.cameraDeath.left &&
+			   entities[index].components.position.x < 0 + camera.x) {
+		        entities[index].components.death.value = true;
+			} else if(entities[index].components.cameraDeath.right &&
+			   entities[index].components.position.x > app.canvas.width + camera.x) {
+		        entities[index].components.death.value = true;
+			}
+		}
+	}
+};
+
+app.handleCollision = function(entities) {
+    for(var index = entities.length - 1; index >= 1; --index) {
+	    for(var index2 = index - 1; index2 >=0; --index2) {
+		    if(entities[index] && entities[index2] &&
+			   entities[index].components.collision &&
+			   entities[index2].components.collision &&
+			   (entities[index].components.position.x +
+			   entities[index].components.size.width >
+			   entities[index2].components.position.x &&
+			   entities[index2].components.position.x +
+			   entities[index2].components.size.width >
+			   entities[index].components.position.x) &&
+			   (entities[index].components.position.y +
+			   entities[index].components.size.height >
+			   entities[index2].components.position.y &&
+			   entities[index2].components.position.y +
+			   entities[index2].components.size.height >
+			   entities[index].components.position.y)) {
+			   if(entities[index2].components.collision.ally != entities[index]) {
+			       if(entities[index].components.health)
+			           entities[index].components.health.value -= entities[index2].components.collision.damage;
+				   if(entities[index2].components.collision.death) {
+				       entities[index2].components.death.value = true;
+					   ++app.score;
+				   }
+			   }
+			   if(entities[index].components.collision.ally != entities[index2]) {
+			       if(entities[index2].components.health)
+				       entities[index2].components.health.value -= entities[index].components.collision.damage;
+			       if(entities[index].components.collision.death) {
+				       entities[index].components.death.value = true;
+					   ++app.score;
+				   }
+			   }
+			}
+		}
+	}
+};
+
+app.handleDeath = function(entities) {
+    for(var index = entities.length - 1; index >= 0; --index) {
+	    if((entities[index].components.death &&
+		   entities[index].components.death.value == true) ||
+		   (entities[index].components.health &&
+		   entities[index].components.health.value <= 0)) {
+		    entities.splice(index, 1);
+		}
+	}
+};
+app.handleRendering = function(entities, camera) {
+    app.canvasContext.clearRect(0, 0, app.canvas.width, app.canvas.height);
+    for(var index in entities) {
+	    if(entities[index].components.visual &&
+		   entities[index].components.position &&
+		   entities[index].components.size) {
+		    app.canvasContext.lineWidth = entities[index].components.visual.lineWidth;
+            app.canvasContext.strokeStyle = entities[index].components.visual.color;
+			app.canvasContext.strokeRect(entities[index].components.position.x - camera.x,
+			                             entities[index].components.position.y - camera.y,
+										 entities[index].components.size.width,
+										 entities[index].components.size.height);
+			
+			if(entities[index].components.health) {
+                app.canvasContext.font = (entities[index].components.size.height / 5) + "px sans-serif";
+				app.canvasContext.strokeStyle = "yellow";
+				app.canvasContext.strokeText(entities[index].components.health.value,
+				                           entities[index].components.position.x + entities[index].components.size.width / 2 - entities[index].components.size.height / 5 - camera.x,
+										   entities[index].components.position.y + entities[index].components.size.height / 2 - camera.y);
+                app.canvasContext.fillStyle = entities[index].components.visual.color;
+                app.canvasContext.fillText(entities[index].components.health.value,
+				                           entities[index].components.position.x + entities[index].components.size.width / 2 - entities[index].components.size.height / 5 - camera.x,
+										   entities[index].components.position.y + entities[index].components.size.height / 2 - camera.y);
+			}
+		}
+	}
+	app.canvasContext.font = "25px sans-serif";
+	app.canvasContext.strokeStyle = "yellow";
+	app.canvasContext.strokeText(app.score, 0, 25);
+	app.canvasContext.fillStyle = "red";
+	app.canvasContext.fillText(app.score, 0, 25);
+};
+
+app.mainLoop = function() {
+	if(app.timeStamp == Infinity)
+       app.timeStamp = 0;
+    ++app.timeStamp;
+    --app.camera.y;
+	
+    if(app.timeStamp % 150 == 0) {
+	    var enemy = new app.Enemy({
+            x: app.canvas.width * Math.random(),
+            y: app.camera.y,
+	        isShooting: true
+        });
+		enemy.components.shooter.target = app.player.components.position;
+        app.entities.push(enemy);
+    }
+	if(app.timeStamp % 3000 == 0) {
+	    app.entities.push(new app.Aid({
+		    x: app.canvas.width * Math.random(),
+			y: app.camera.y
+		}));
+	}
+	app.handleEvent(app.entities, app.event);
+	app.handleShooting(app.entities);
+	app.handleMovement(app.entities);
+	app.handleCameraDeath(app.entities, app.camera);
+	app.handleCollision(app.entities);
+	app.handleDeath(app.entities);
+    app.handleRendering(app.entities, app.camera);
+    requestAnimationFrame(app.mainLoop);
+};
+
+app.resize = function() {
+    app.canvasContext.canvas.width = document.body.offsetWidth;
+    app.canvasContext.canvas.height = document.body.offsetHeight;
+};
+
+app.init = function() {
+    app.resize();
+	app.player = new app.Player({
+        x: app.canvas.width / 2,
+        y: app.canvas.height / 2,
+		width: 50,
+		height: 50
+    });
+	app.entities = [];
+    app.entities.push(app.player);
+    requestAnimationFrame(app.mainLoop);
+};
+
+document.addEventListener("touchstart", function(event) {
+    app.event.occured = true;
+    app.event.x = event.touches[0].clientX + app.camera.x;
+    app.event.y = event.touches[0].clientY + app.camera.y;
+});
+document.addEventListener("touchmove", function(event) {
+    app.event.occured = true;
+    app.event.x = event.touches[0].clientX + app.camera.x;
+    app.event.y = event.touches[0].clientY + app.camera.y;
+});
+document.addEventListener("touchend", function(event) {
+    app.event.occured = true;
+    app.event.x = event.touches[0].clientX + app.camera.x;
+    app.event.y = event.touches[0].clientY + app.camera.y;
+});
+window.addEventListener("resize", app.resize);
+window.addEventListener("load", app.init);
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width"/>
+</head>
+<body>
+    <input id="input" style="width:100%"/><button id="input-button" style="width:100%">enter</button>
+    <div id="output"/>
+    <script type="text/javascript">
+    var input = document.getElementById("input");
+    var inputButton = document.getElementById("input-button");
+    var output = document.getElementById("output");
+    function print(text) {
+        output.innerHTML += text + "<br/>";
+    }
+    function clear() {
+        output.innerHTML = "";
+    }
+	function printAttrs(object) {
+	    for(var key in object)
+		    print(key + ": " + object[key]);
+	}
+    input.addEventListener("keydown", function(event) {
+        if(event.keyCode == 13) {
+		    try {
+                eval(input.value);
+                input.value = "";
+			} catch(exception) {
+			    print(exception);
+			}
+        }
+    });
+    inputButton.addEventListener("click", function(event) {
+        eval(input.value);
+        input.value = "";
+    });
+
+    </script>
+</body>
+</html>
