@@ -1,0 +1,9 @@
+mkdir -p ~/.S
+for file in $(ls); do
+    echo Encrypting $file ...
+    gpg -r "Byeonggon Lee" -o ~/.S/$file.gpg --yes -e $file
+    if [ $? -ne 0 ]; then
+        echo "Something gone wrong"
+    fi
+done
+#gpg -r "Byeonggon Lee" -e 
