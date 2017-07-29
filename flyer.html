@@ -3,93 +3,35 @@
     <meta name="viewport" content="width=device-width"/>
     <meta name="viewport" content="user-scalable=no"/>
     <title>Test</title>
+    <script type="text/javascript" src="vector.js"></script>
 </head>
 <body>
 <canvas id="canvas" style="background-color:black"/>
-
 <script type="text/javascript">
-  
-var app = {
-    score: 0,
-    timeStamp: 0,
-    event: {
-        occured: false,
-        x: 0,
-        y: 0
-    },
-    camera: {
-        x: 0,
-        y: 0
-    }
+
+var app = app || {};
+app.score = 0;
+app.timeStamp = 0;
+app.event = {
+    occured: false,
+    x: 0,
+    y: 0
+};
+app.camera = {
+    x: 0,
+    y: 0
 };
 app.canvas = document.getElementById("canvas");
 app.canvasContext = document.getElementById("canvas").getContext("2d");
 
-app.Vector = function(x, y) {
-    this.x = x;
-    this.y = y;
-};
-
-app.Vector.fromAngle = function(angle, magnitude) {
-    return new app.Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
-};
-
-app.Vector.clone = function(vector) {
-    return new app.Vector(vector.x, vector.y);
-};
-
-app.Vector.add = function(vector1, vector2) {
-    return new app.Vector(vector1.x + vector2.x, vector1.y + vector2.y);
-};
-
-app.Vector.prototype.clone = function() {
-    return new app.Vector(this.x, this.y);
-};
-
-app.Vector.prototype.set = function(x, y) {
-    this.x = x;
-    this.y = y;
-    return this;
-};
-
-app.Vector.prototype.getMagnitude = function() {
-    return Math.sqrt(this.x * this.x + this.y * this.y);
-};
-
-app.Vector.prototype.getAngle = function() {
-    return Math.atan2(this.y, this.x);
-};
-
-app.Vector.prototype.setAngle = function(angle) {
-    var magnitude = this.getMagnitude();
-    this.x = magnitude * Math.cos(angle);
-    this.y = magnitude * Math.sin(angle);
-    return this;
-};
-
-app.Vector.prototype.setMagnitude = function(magnitude) {
-    var angle = this.getAngle();
-    this.x = magnitude * Math.cos(angle);
-    this.y = magnitude * Math.sin(angle);
-    return this;
-};
-
-app.Vector.prototype.add = function(vector) {
-    this.x += vector.x;
-    this.y += vector.y;
-};
-
-app.Vector.prototype.subtract = function(vector) {
-    this.x -= vector.x;
-    this.y -= vector.y;
-};
-
 app.Entity = function() {
   this.components = {};
 };
+
 app.Entity.prototype.addComponent = function(component) {
   this.components[component.name] = component;
 };
+
 app.Entity.prototype.removeComponent = function(componentName) {
   var component = this.components[componentName];
   delete this.components[compomentName];
@@ -490,19 +432,6 @@ app.resize = function() {
     app.canvasContext.canvas.height = document.body.offsetHeight;
 };
 
-app.init = function() {
-    app.resize();
-    app.player = new app.Player({
-        x: app.canvas.width / 2,
-        y: app.canvas.height / 2,
-        width: 50,
-        height: 50
-    });
-    app.entities = [];
-    app.entities.push(app.player);
-    requestAnimationFrame(app.mainLoop);
-};
-
 document.addEventListener("touchstart", function(event) {
     app.event.occured = true;
     app.event.x = event.touches[0].clientX + app.camera.x;
@@ -519,7 +448,18 @@ document.addEventListener("touchend", function(event) {
     app.event.y = event.touches[0].clientY + app.camera.y;
 });
 window.addEventListener("resize", app.resize);
-window.addEventListener("load", app.init);
+window.addEventListener("load", function() {
+    app.resize();
+    app.player = new app.Player({
+        x: app.canvas.width / 2,
+        y: app.canvas.height / 2,
+        width: 50,
+        height: 50
+    });
+    app.entities = [];
+    app.entities.push(app.player);
+    requestAnimationFrame(app.mainLoop);
+});
 </script>
 </body>
 </html>
