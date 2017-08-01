@@ -1,0 +1,83 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="viewport" content="user-scalable=no"/>
+    <script type="text/javascript" src="vector.js"></script>
+<title>Test</title>
+</head>
+<body>
+<canvas id="canvas" style="background-color:black"/>
+<script type="text/javascript">
+var app = app || {};
+app.updateTimeStep = 1000 / 25;
+app.canvas = document.getElementById("canvas");
+app.canvasContext = document.getElementById("canvas").getContext("2d");
+app.rect = {
+    width: 100,
+    height: 100,
+    x: 0,
+    y: 0,
+    velX: 0,
+    velY: 0,
+    accX: 0,
+    accY: 0
+};
+app.pressedKeys = [];
+
+app.resize = function() {
+    app.canvas.width = document.body.offsetWidth;
+    app.canvas.height = document.body.offsetHeight;
+};
+
+app.update = function() {
+    if(app.pressedKeys[37])
+        app.rect.accX = -1;
+    if(app.pressedKeys[38])
+        app.rect.accY = -1;
+    if(app.pressedKeys[39])
+        app.rect.accX = 1;
+    if(app.pressedKeys[40])
+        app.rect.accY = 1;
+
+    app.rect.velX += app.rect.accX;
+    app.rect.accX = 0;
+    app.rect.velY += app.rect.accY;
+    app.rect.accY = 0;
+    app.rect.x += app.rect.velX;
+    app.rect.y += app.rect.velY;
+};
+
+app.render = function(interpolation) {
+    app.canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+    app.canvasContext.fillRect(app.rect.x + app.rect.velX * interpolation, app.rect.y + app.rect.velY * interpolation, app.rect.width, app.rect.height);
+};
+app.loop = function() {
+    var interpolation;
+    while(app.nextUpdateTimeStamp < Date.now()) {
+        app.update();
+        app.nextUpdateTimeStamp += app.updateTimeStep;
+    }
+    interpolation = (Date.now() + app.updateTimeStep - app.nextUpdateTimeStamp) / app.updateTimeStep; 
+    app.render(interpolation);
+    requestAnimationFrame(app.loop);
+};
+
+app.init = function() {
+    app.resize();
+    app.canvasContext.fillStyle = "white";
+    app.nextUpdateTimeStamp = Date.now();
+    requestAnimationFrame(app.loop);
+};
+
+window.addEventListener("resize", app.resize);
+window.addEventListener("load", app.init);
+window.addEventListener("keydown", function(event) {
+    app.pressedKeys[event.keyCode] = true;
+});
+window.addEventListener("keyup", function(event) {
+    app.pressedKeys[event.keyCode] = false;
+});
+
+</script>
+</body>
+</html>
