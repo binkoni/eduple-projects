@@ -8,6 +8,11 @@ console.clear = function() {
 console.init = function(params) {
     console.input = params.input;
     console.output = params.output;
+    console.inputButton = params.inputButton;
+    console.inputButton.addEventListener("click", function(event) {
+        eval(console.input.value);
+        console.input.value = "";
+    });
 };
 console.input.addEventListener("keydown", function(event) {
     if(event.keyCode == 13) {
@@ -20,7 +25,3 @@ console.input.addEventListener("keydown", function(event) {
     }
 });
 
-console.inputButton.addEventListener("click", function(event) {
-    eval(console.input.value);
-    console.input.value = "";
-});

@@ -10,30 +10,7 @@
     var input = document.getElementById("input");
     var inputButton = document.getElementById("input-button");
     var output = document.getElementById("output");
-    function print(text) {
-        output.innerHTML += text + "<br/>";
-    }
-    function clear() {
-        output.innerHTML = "";
-    }
-    function printAttrs(object) {
-        for(var key in object)
-            print(key + ": " + object[key]);
-    }
-    input.addEventListener("keydown", function(event) {
-        if(event.keyCode == 13) {
-            try {
-                eval(input.value);
-                input.value = "";
-            } catch(exception) {
-                print(exception);
-            }
-        }
-    });
-    inputButton.addEventListener("click", function(event) {
-        eval(input.value);
-        input.value = "";
-    });
+    console.init({input: input, inputButton: inputButton, output: output});
     </script>
 </body>
 </html>
