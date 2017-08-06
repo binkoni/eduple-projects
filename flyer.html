@@ -139,7 +139,8 @@ app.Player = function(params) {
     this.addComponent(new app.Death(false));
 };
 app.Player.prototype = {};
-app.Player.prototype.__proto__ = app.Entity.prototype;
+app.Player.prototype = Object.create(app.Entity.prototype);
+app.Player.prototype.constructor = app.Player;
 
 app.Enemy = function(params) {
     app.Entity.call(this);
