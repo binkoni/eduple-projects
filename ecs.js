@@ -43,39 +43,39 @@ app.System.prototype.componentRemoved = function(entity) {
         delete this.entities[entity.id];
 };
 
-app.Ecs = function(idGenerator) {
+app.EcsManager = function(idGenerator) {
     this.idGenerator = idGenerator;
     this.entities = {};
     this.systems = {};
 };
 
-app.Ecs.prototype.createEntity = function() {
+app.EcsManager.prototype.createEntity = function() {
     var id = this.idGenerator.generate();
     this.entities[id] = new app.Entity(id);
 };
 
-app.Ecs.prototype.destroyEntity = function(id) {
+app.EcsManager.prototype.destroyEntity = function(id) {
     for(var index in this.systems)
         this.systems[index].entityDestroyed(this.entities[id]);
     delete this.entities[id];
 };
 
-app.Ecs.prototype.addComponent = function(entity, component) {
+app.EcsManager.prototype.addComponent = function(entity, component) {
     entity.components[component.componentName] = component;
     for(var index in this.systems)
         this.systems[index].componentAdded(entity);
 };
 
-app.Ecs.prototype.removeComponent = function(entity, componentName) {
+app.EcsManager.prototype.removeComponent = function(entity, componentName) {
     delete entity.components[componentName];
     for(var index in this.systems)
         this.systems[index].componentRemoved(entity);
 };
 
-app.Ecs.prototype.addSystem = function(system) {
+app.EcsManager.prototype.addSystem = function(system) {
     this.systems[system.systemName] = system;
 };
 
-app.Ecs.prototype.removeSystem = function(systemName) {
+app.EcsManager.prototype.removeSystem = function(systemName) {
     delete this.system[systemName];
 };
