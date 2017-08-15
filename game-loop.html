@@ -6,7 +6,7 @@
 <title>Test</title>
 </head>
 <body>
-<canvas id="canvas" style="background-color:black"/>
+<canvas id="canvas" style="background-color:gray"/>
 <script type="text/javascript">
 var app = app || {};
 app.updateTimeStep = 1000 / 25;
@@ -49,6 +49,7 @@ app.update = function() {
 
 app.render = function(interpolation) {
     app.canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+    app.canvasContext.fillStyle = "white";
     app.canvasContext.fillRect(app.rect.x + app.rect.velX * interpolation, app.rect.y + app.rect.velY * interpolation, app.rect.width, app.rect.height);
 };
 app.loop = function() {
@@ -64,7 +65,6 @@ app.loop = function() {
 
 app.init = function() {
     app.resize();
-    app.canvasContext.fillStyle = "white";
     app.nextUpdateTimeStamp = Date.now();
     requestAnimationFrame(app.loop);
 };
