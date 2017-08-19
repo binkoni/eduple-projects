@@ -4,6 +4,13 @@
 </head>
 <body>
 <canvas id="canvas"/>
-<script type="text/javascript" src="ecs-test.js"></script>
+<script type="text/javascript" src="ecs.js"></script>
+<script>
+var app = app || {};
+app.ecsManager = new app.EcsManager(new app.IdGenerator());
+var entity = app.ecsManager.createEntity();
+alert(entity)
+
+</script>
 </body>
 </html>

@@ -52,6 +52,7 @@ app.EcsManager = function(idGenerator) {
 app.EcsManager.prototype.createEntity = function() {
     var id = this.idGenerator.generate();
     this.entities[id] = new app.Entity(id);
+    return this.entities[id];
 };
 
 app.EcsManager.prototype.destroyEntity = function(id) {
