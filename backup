@@ -1,9 +1,12 @@
-mkdir -p ~/.S
-for file in $(ls); do
-    echo Encrypting $file ...
-    gpg -r "Byeonggon Lee" -o ~/.S/$file.gpg --yes -e $file
-    if [ $? -ne 0 ]; then
-        echo "Something gone wrong"
-    fi
-done
+#mkdir -p ~/.S
+#for file in $(ls); do
+#    echo Encrypting $file ...
+#    gpg -r "Byeonggon Lee" -o ~/.S/$file.gpg --yes -e $file
+#    if [ $? -ne 0 ]; then
+#        echo "Something gone wrong"
+#    fi
+#done
 #gpg -r "Byeonggon Lee" -e 
+tar -cvzf ~/.B.tar.gz .git
+gpg -r 'Byeonggon Lee' -o ~/.B.tar.gz.gpg --yes -e ~/.B.tar.gz
+rm ~/.B.tar.gz
