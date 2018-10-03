@@ -433,15 +433,30 @@ app.resize = function() {
     app.canvasContext.canvas.height = document.body.offsetHeight;
 };
 
+document.addEventListener("mousedown", function(event) {
+    app.event.occured = true;
+    app.event.x = event.clientX + app.camera.x;
+    app.event.y = event.clientY + app.camera.y;
+});
 document.addEventListener("touchstart", function(event) {
     app.event.occured = true;
     app.event.x = event.touches[0].clientX + app.camera.x;
     app.event.y = event.touches[0].clientY + app.camera.y;
 });
+document.addEventListener("mousemove", function(event) {
+    app.event.occured = true;
+    app.event.x = event.clientX + app.camera.x;
+    app.event.y = event.clientY + app.camera.y;
+});
 document.addEventListener("touchmove", function(event) {
     app.event.occured = true;
     app.event.x = event.touches[0].clientX + app.camera.x;
     app.event.y = event.touches[0].clientY + app.camera.y;
+});
+document.addEventListener("mouseup", function(event) {
+    app.event.occured = true;
+    app.event.x = event.clientX + app.camera.x;
+    app.event.y = event.clientY + app.camera.y;
 });
 document.addEventListener("touchend", function(event) {
     app.event.occured = true;

@@ -157,7 +157,7 @@ app.init = function() {
     app.canvasContext = document.getElementById("canvas").getContext("2d");
     app.console = document.getElementById("console");
     app.resize();
-    app.fields = [new app.Field(new app.Vector(app.canvas.width / 2, app.canvas.height / 2), 50), new app.Field(new app.Vector(app.canvas.width / 4, app.canvas.height / 4), 50)];
+    app.fields = [new app.Field(new app.Vector(app.canvas.width / 2, app.canvas.height / 2), 10)];
     app.emitter = new app.Emitter(new app.Vector(app.canvas.width / 2, app.canvas.height / 2), Math.PI / 2, 3);
     app.particles = [];
     app.traces = [];
@@ -170,16 +170,45 @@ document.addEventListener("touchstart", function(event) {
     app.event.y = event.touches[0].clientY;
 });
 
+document.addEventListener("contextmenu", function(event) {
+    event.preventDefault();
+})
+
+document.addEventListener("mousedown", function(event) {
+    if(event.button == 2) {
+        app.fields.push(new app.Field(new app.Vector(event.clientX, event.clientY), 10));
+    } else {
+        app.event.occured = true;
+        app.event.downoccured = true;
+        app.event.x = event.clientX;
+        app.event.y = event.clientY;
+    }
+});
+
 document.addEventListener("touchmove", function(event) {
     app.event.occured = true;
     app.event.x = event.touches[0].clientX;
     app.event.y = event.touches[0].clientY;
 });
 
+document.addEventListener("mousemove", function(event) {
+    if(app.event.downoccured == true)
+        app.event.occured = true;
+    app.event.x = event.clientX;
+    app.event.y = event.clientY;
+});
+
 document.addEventListener("touchend", function(event) {
     app.event.occured = false;
     app.event.x = event.touches[0].clientX;
     app.event.y = event.touches[0].clientY;
+});
+
+document.addEventListener("mouseup", function(event) {
+    app.event.downoccured = false;
+    app.event.occured = false;
+    app.event.x = event.clientX;
+    app.event.y = event.clientY;
 });
 
 window.addEventListener("resize", app.resize);
