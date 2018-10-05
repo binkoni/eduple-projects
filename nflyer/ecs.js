@@ -47,46 +47,46 @@ ECS.System.prototype.process = function() {
     throw Error("Method not implemented")
 }
 
-ECS.EcsManager = function(idGenerator) {
+ECS.Manager = function(idGenerator) {
     this.idGenerator = idGenerator || new ECS.IdGenerator();
     this.entities = {};
     this.systems = {};
 };
 
-ECS.EcsManager.prototype.createEntity = function() {
+ECS.Manager.prototype.createEntity = function() {
     var id = this.idGenerator.generate();
     var entity = new ECS._Entity(id);
     this.entities[id] = entity;
     return entity;
 };
 
-ECS.EcsManager.prototype.destroyEntity = function(id) {
+ECS.Manager.prototype.destroyEntity = function(id) {
     for(var index in this.systems)
         this.systems[index].entityDestroyed(this.entities[id]);
     delete this.entities[id];
 };
 
-ECS.EcsManager.prototype.addComponent = function(entity, component) {
+ECS.Manager.prototype.addComponent = function(entity, component) {
     entity.components[component.componentName] = component;
     for(var index in this.systems)
         this.systems[index].componentAdded(entity);
 };
 
-ECS.EcsManager.prototype.removeComponent = function(entity, componentName) {
+ECS.Manager.prototype.removeComponent = function(entity, componentName) {
     delete entity.components[componentName];
     for(var index in this.systems)
         this.systems[index].componentRemoved(entity);
 };
 
-ECS.EcsManager.prototype.addSystem = function(system) {
+ECS.Manager.prototype.addSystem = function(system) {
     this.systems[system.systemName] = system;
 };
 
-ECS.EcsManager.prototype.removeSystem = function(systemName) {
+ECS.Manager.prototype.removeSystem = function(systemName) {
     delete this.system[systemName];
 };
 
-ECS.EcsManager.prototype.processEntities = function() {
+ECS.Manager.prototype.processEntities = function() {
    for(var index in this.systems)
 	this.systems[index].process()
 }
